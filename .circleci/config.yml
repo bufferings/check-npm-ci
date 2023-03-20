@@ -85,7 +85,7 @@ jobs:
 
 workflows:
   create-cache:
-    when: << pipeline.parameters.run_integration_tests >>
+    when: << pipeline.parameters.create-cache >>
     jobs:
       - create-cache
   main:
