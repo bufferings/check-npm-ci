@@ -18,10 +18,12 @@ jobs:
       - run: npm ci
       - save_cache:
           key: v1-node_modules-{{ checksum "./package-lock.json" }}
-          path: node_modules
+          paths:
+            - ./node_modules
       - save_cache:
           key: v1-dot-npm-{{ checksum "./package-lock.json" }}
-          path: ~/.npm
+          paths:
+            - ~/.npm
 
   npm-ci-no-cache:
     executor: my-executor
