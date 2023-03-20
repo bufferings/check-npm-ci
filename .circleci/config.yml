@@ -1,0 +1,28 @@
+version: 2.1
+
+executors:
+  my-executor:
+    docker:
+      - image: cimg/node:18.15
+
+jobs:
+  npm-ci-no-cache:
+    executor: my-executor
+    steps:
+      - checkout
+      - run:
+          working_directory: ./app1
+          command: npm ci
+  npm-install-no-cache:
+    executor: my-executor
+    steps:
+      - checkout
+      - run:
+          working_directory: ./app1
+          command: npm ci
+
+workflows:
+  main:
+    jobs:
+      - npm-ci-no-cache
+      - npm-install-no-cache
