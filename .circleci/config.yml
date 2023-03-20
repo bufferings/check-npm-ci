@@ -1,27 +1,93 @@
 version: 2.1
 
+parameters:
+  create-cache:
+    type: boolean
+    default: false
+
 executors:
   my-executor:
     docker:
       - image: cimg/node:18.15
 
 jobs:
+  create-cache:
+    executor: my-executor
+    steps:
+      - checkout
+      - run: npm ci
+      - save_cache:
+          key: v1-node_modules-{{ checksum "./package-lock.json" }}
+          path: node_modules
+      - save_cache:
+          key: v1-dot-npm-{{ checksum "./package-lock.json" }}
+          path: ~/.npm
+
   npm-ci-no-cache:
     executor: my-executor
     steps:
       - checkout
-      - run:
-          working_directory: ./app1
-          command: npm ci
+      - run: npm ci
+  npm-ci-with-node_modules-cache:
+    executor: my-executor
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-node_modules-{{ checksum "./package-lock.json" }}
+  npm-ci-with-dot-npm-cache:
+    executor: my-executor
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-dot-npm-{{ checksum "./package-lock.json" }}
+      - run: npm ci
+  npm-ci-with-dot-npm-cache-fallback:
+    executor: my-executor
+    steps:
+      - checkout
+      - run: |
+          rm package.json
+          rm package-lock.json
+          cp fallback/package.json .
+          cp fallback/package-lock.json .
+      - restore_cache:
+          keys:
+              - v1-dot-npm-{{ checksum "./package-lock.json" }}
+              - v1-dot-npm-
+      - run: npm ci
+
   npm-install-no-cache:
     executor: my-executor
     steps:
       - checkout
-      - run:
-          working_directory: ./app1
-          command: npm ci
+      - run: npm install
+  npm-install-with-node_modules-cache:
+    executor: my-executor
+    steps:
+      - checkout
+      - restore_cache:
+          key: v1-node_modules-{{ checksum "./package-lock.json" }}
+      - run: npm install
+  npm-install-with-fallback:
+    executor: my-executor
+    steps:
+      - checkout
+      - run: |
+          rm package.json
+          rm package-lock.json
+          cp fallback/package.json .
+          cp fallback/package-lock.json .
+      - restore_cache:
+          keys:
+            - v1-node_modules-{{ checksum "./package-lock.json" }}
+            - v1-node_modules-
+      - run: npm install
 
 workflows:
+  create-cache:
+    when: << pipeline.parameters.run_integration_tests >>
+    jobs:
+      - create-cache
   main:
     jobs:
       - npm-ci-no-cache
