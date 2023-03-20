@@ -93,4 +93,9 @@ workflows:
   main:
     jobs:
       - npm-ci-no-cache
+      - npm-ci-with-node_modules-cache
+      - npm-ci-with-dot-npm-cache
+      - npm-ci-with-dot-npm-cache-fallback
       - npm-install-no-cache
+      - npm-install-with-node_modules-cache
+      - npm-install-with-fallback
