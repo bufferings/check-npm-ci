@@ -9,6 +9,7 @@ executors:
   my-executor:
     docker:
       - image: cimg/node:18.15
+    resource_class: small
 
 jobs:
   create-cache:
