@@ -92,6 +92,7 @@ workflows:
     jobs:
       - create-cache
   main:
+    unless: << pipeline.parameters.create-cache >>
     jobs:
       - npm-ci-no-cache
       - npm-ci-with-node_modules-cache
